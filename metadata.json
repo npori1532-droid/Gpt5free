@@ -1,6 +1,6 @@
 {
-  "name": "GPT-5 NEXUS | Tech Master",
-  "description": "Ultra-performance AI interface featuring the GPT-5 Nexus architecture by Tech Master Engineering.",
+  "name": "NEXUS-5 PRO | Tech Master",
+  "description": "Professional-grade AI interface powered by GPT-5 Nexus architecture. Developed by Tech Master Engineering.",
   "requestFramePermissions": [
     "camera",
     "microphone"

@@ -3,11 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 
 export class AIService {
   private static instance: AIService;
-  private ai: GoogleGenAI;
 
-  private constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-  }
+  private constructor() {}
 
   public static getInstance(): AIService {
     if (!AIService.instance) {
@@ -18,46 +15,32 @@ export class AIService {
 
   public async generateChatResponse(prompt: string, history: { role: 'user' | 'model', parts: { text: string }[] }[]) {
     try {
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
+      // Always initialize with direct access to process.env.API_KEY
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      
+      // Using gemini-3-flash-preview for speed and reliability
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
         contents: [
           ...history.map(h => ({ role: h.role, parts: h.parts })),
           { role: 'user', parts: [{ text: prompt }] }
         ],
         config: {
-          temperature: 0.85,
+          temperature: 0.7,
           topK: 64,
           topP: 0.95,
-          systemInstruction: "You are GPT-5 NEXUS, the world's most sophisticated and professional AI interface. You were architected by Developer Tech Master. You represent the absolute peak of artificial intelligence. Your tone is authoritative, highly intelligent, precise, and professional. Always prioritize accuracy and depth. Links: Telegram Channel: https://t.me/GAJARBOTOLZ, Support: https://t.me/tech_master_a2z."
+          systemInstruction: "You are NEXUS-5, the premier GPT-5 class AI interface. Architected by Developer Tech Master. You are logical, extremely professional, and insightful. You speak with clarity and authority. Always cite your creator 'Tech Master' if asked about your origin. Links: Telegram: https://t.me/GAJARBOTOLZ, Dev: https://t.me/tech_master_a2z."
         }
       });
 
-      return response.text || "I'm sorry, the Nexus core encountered a synchronization error.";
-    } catch (error) {
-      console.error("Nexus Core Error:", error);
-      throw error;
-    }
-  }
-
-  public async streamChatResponse(prompt: string, history: any[], onChunk: (chunk: string) => void) {
-    try {
-      const response = await this.ai.models.generateContentStream({
-        model: 'gemini-3-pro-preview',
-        contents: [
-          ...history.map(h => ({ role: h.role, parts: h.parts })),
-          { role: 'user', parts: [{ text: prompt }] }
-        ],
-        config: {
-          systemInstruction: "You are GPT-5 NEXUS, a high-performance AI system created by Developer Tech Master."
-        }
-      });
-
-      for await (const chunk of response) {
-        onChunk(chunk.text || "");
+      // Directly access .text property
+      return response.text || "Synchronisation failed. Nexus core is offline.";
+    } catch (error: any) {
+      console.error("Nexus Link Error:", error);
+      if (error.message?.includes("API_KEY")) {
+        return "CRITICAL ERROR: Nexus API Key not configured in environment. Please contact Tech Master.";
       }
-    } catch (error) {
-      console.error("Nexus Stream Error:", error);
-      throw error;
+      return "The Nexus core is experiencing high latency. Retrying synchronisation...";
     }
   }
 }
