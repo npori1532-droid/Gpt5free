@@ -4,7 +4,7 @@ import {
   MessageSquare, Plus, ExternalLink, Send, Trash2, 
   Cpu, ShieldCheck, Zap, Layers, Globe, Star 
 } from 'lucide-react';
-import { ChatSession } from '../types';
+import { ChatSession } from '../types.ts';
 
 interface SidebarProps {
   sessions: ChatSession[];
@@ -96,6 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sessions, activeSessionId, onNewChat,
             <a 
               href="https://t.me/GAJARBOTOLZ" 
               target="_blank" 
+              rel="noopener noreferrer"
               className="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-300 hover:text-white transition-all border border-transparent hover:border-indigo-500/20"
             >
               <Send className="w-4 h-4 text-sky-400" />
@@ -105,6 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sessions, activeSessionId, onNewChat,
             <a 
               href="https://t.me/tech_master_a2z" 
               target="_blank" 
+              rel="noopener noreferrer"
               className="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-300 hover:text-white transition-all border border-transparent hover:border-indigo-500/20"
             >
               <Zap className="w-4 h-4 text-amber-400" />

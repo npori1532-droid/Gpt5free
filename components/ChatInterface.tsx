@@ -4,7 +4,7 @@ import {
   Send, User, Bot, Sparkles, Terminal, Copy, Check, 
   Activity, Cpu, Shield, ArrowRight, Zap 
 } from 'lucide-react';
-import { Message } from '../types';
+import { Message } from '../types.ts';
 
 interface ChatInterfaceProps {
   messages: Message[];

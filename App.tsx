@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import Sidebar from './components/Sidebar';
-import ChatInterface from './components/ChatInterface';
-import { AIService } from './services/geminiService';
-import { Message, ChatSession } from './types';
+import Sidebar from './components/Sidebar.tsx';
+import ChatInterface from './components/ChatInterface.tsx';
+import { AIService } from './services/geminiService.ts';
+import { Message, ChatSession } from './types.ts';
 import { Menu, X, Command, Plus } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -15,13 +15,17 @@ const App: React.FC = () => {
   useEffect(() => {
     const saved = localStorage.getItem('nexus_pro_sessions');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      parsed.forEach((s: any) => {
-        s.createdAt = new Date(s.createdAt);
-        s.messages.forEach((m: any) => m.timestamp = new Date(m.timestamp));
-      });
-      setSessions(parsed);
-      if (parsed.length > 0) setActiveSessionId(parsed[0].id);
+      try {
+        const parsed = JSON.parse(saved);
+        parsed.forEach((s: any) => {
+          s.createdAt = new Date(s.createdAt);
+          s.messages.forEach((m: any) => m.timestamp = new Date(m.timestamp));
+        });
+        setSessions(parsed);
+        if (parsed.length > 0) setActiveSessionId(parsed[0].id);
+      } catch (e) {
+        console.error("Local Storage sync failed:", e);
+      }
     }
   }, []);
 
@@ -97,7 +101,7 @@ const App: React.FC = () => {
         messages: [...s.messages, botMessage] 
       } : s));
     } catch (e) {
-      console.error(e);
+      console.error("Chat Process Error:", e);
     } finally {
       setIsLoading(false);
     }
