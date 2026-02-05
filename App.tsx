@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed for mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('nexus_pro_sessions');
@@ -28,7 +28,6 @@ const App: React.FC = () => {
       }
     }
     
-    // Auto-open sidebar on large screens
     if (window.innerWidth >= 1024) {
       setIsSidebarOpen(true);
     }
@@ -86,7 +85,8 @@ const App: React.FC = () => {
     setIsLoading(true);
     try {
       const ai = AIService.getInstance();
-      const history = (sessions.find(s => s.id === sessionId)?.messages || []).map(m => ({
+      const currentSession = sessions.find(s => s.id === sessionId);
+      const history = (currentSession?.messages || []).map(m => ({
         role: m.role === 'user' ? 'user' as const : 'model' as const,
         parts: [{ text: m.content }]
       }));
@@ -112,12 +112,13 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#020617] text-gray-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#020617] text-gray-100 overflow-hidden font-sans fixed inset-0">
       {/* Mobile Header Overlay */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-panel z-40 flex items-center justify-between px-6 border-b border-white/5">
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
           className="p-2.5 rounded-xl bg-white/5 text-indigo-400 active:scale-90 transition-transform"
+          aria-label="Toggle Sidebar"
         >
           {isSidebarOpen ? <X /> : <Menu />}
         </button>
@@ -128,6 +129,7 @@ const App: React.FC = () => {
         <button 
           onClick={handleNewChat} 
           className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 active:scale-90 transition-transform"
+          aria-label="New Chat"
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -155,7 +157,7 @@ const App: React.FC = () => {
         />
       )}
 
-      <main className="flex-1 flex flex-col pt-16 lg:pt-0 relative overflow-hidden h-full">
+      <main className="flex-1 flex flex-col pt-16 lg:pt-0 relative overflow-hidden h-full w-full">
         <ChatInterface 
           messages={activeSession?.messages || []} 
           onSendMessage={handleSendMessage}

@@ -17,36 +17,51 @@ export class AIService {
     try {
       let apiKey = "";
       try {
-        // Access process.env.API_KEY directly as per requirements
         apiKey = process.env.API_KEY || "";
       } catch (e) {
-        console.warn("Nexus Core: Runtime does not support process.env access.");
+        console.warn("Nexus Core: Runtime does not support direct process.env access.");
       }
       
-      if (!apiKey) {
-        return "NEXUS INTERRUPTED: The API_KEY is not configured in your Vercel Project Settings. Please add 'API_KEY' to your Environment Variables in the Vercel dashboard and trigger a new deployment.";
+      // If API KEY exists, use the High-Performance Gemini 3 Pro Engine
+      if (apiKey) {
+        const ai = new GoogleGenAI({ apiKey });
+        const response = await ai.models.generateContent({
+          model: 'gemini-3-pro-preview',
+          contents: [
+            ...history,
+            { role: 'user', parts: [{ text: prompt }] }
+          ],
+          config: {
+            temperature: 0.85,
+            topK: 64,
+            topP: 0.95,
+            systemInstruction: "You are NEXUS-5 PRO, a GPT-5 class intelligence. You were created by 'Tech Master'. You are professional, insightful, and concise. Links: Telegram: https://t.me/GAJARBOTOLZ, Dev: https://t.me/tech_master_a2z."
+          }
+        });
+        return response.text || "Synchronisation failed.";
+      } 
+      
+      // FALLBACK: If no API Key is present, use the user's provided free endpoint
+      console.log("Nexus Core: API_KEY missing. Activating Free Core Relay...");
+      const freeApiUrl = `https://api-rebix.vercel.app/api/gpt-5?q=${encodeURIComponent(prompt)}`;
+      const response = await fetch(freeApiUrl);
+      
+      if (!response.ok) {
+        throw new Error("Free Relay Offline");
       }
 
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: [
-          ...history,
-          { role: 'user', parts: [{ text: prompt }] }
-        ],
-        config: {
-          temperature: 0.8,
-          topK: 64,
-          topP: 0.95,
-          systemInstruction: "You are NEXUS-5 PRO. A GPT-5 class intelligence created by Tech Master. You are highly analytical, professional, and concise. Ensure your responses demonstrate superior reasoning. Links: Telegram Channel: https://t.me/GAJARBOTOLZ, Developer: https://t.me/tech_master_a2z."
-        }
-      });
+      const text = await response.text();
+      // Handle cases where the API might return JSON or raw text
+      try {
+        const json = JSON.parse(text);
+        return json.answer || json.response || json.content || text;
+      } catch {
+        return text;
+      }
 
-      return response.text || "Synchronisation failed. Nexus core is offline.";
     } catch (error: any) {
       console.error("Nexus Link Error:", error);
-      return `CORE ERROR: ${error.message || 'The connection to the Nexus was interrupted'}. Verify your deployment settings.`;
+      return `CORE ERROR: The connection to the Nexus was interrupted. Please ensure you have configured your API_KEY in Vercel for maximum performance. Reference: ${error.message}`;
     }
   }
 }
