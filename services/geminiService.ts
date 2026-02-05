@@ -15,10 +15,21 @@ export class AIService {
 
   public async generateChatResponse(prompt: string, history: { role: 'user' | 'model', parts: { text: string }[] }[]) {
     try {
-      // Always initialize with direct access to process.env.API_KEY
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Safely access process.env.API_KEY to avoid potential ReferenceErrors 
+      // in environments where process might not be globally defined.
+      let apiKey = "";
+      try {
+        apiKey = process.env.API_KEY || "";
+      } catch (e) {
+        console.warn("Nexus Core: process.env access failed, attempting fallback.");
+      }
       
-      // Using gemini-3-flash-preview for speed and reliability
+      if (!apiKey) {
+        return "CRITICAL ERROR: Nexus API Key not found. Please ensure the project environment variable 'API_KEY' is configured in your hosting dashboard.";
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [
@@ -33,14 +44,10 @@ export class AIService {
         }
       });
 
-      // Directly access .text property
       return response.text || "Synchronisation failed. Nexus core is offline.";
     } catch (error: any) {
       console.error("Nexus Link Error:", error);
-      if (error.message?.includes("API_KEY")) {
-        return "CRITICAL ERROR: Nexus API Key not configured in environment. Please contact Tech Master.";
-      }
-      return "The Nexus core is experiencing high latency. Retrying synchronisation...";
+      return `The Nexus core reported an error: ${error.message || 'Unknown network interference'}. Please verify your API configuration.`;
     }
   }
 }
