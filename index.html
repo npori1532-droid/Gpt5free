@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPT-5 NEXUS | TECH MASTER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --accent: #6366f1;
+        --accent-bright: #a855f7;
+      }
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #020617;
+        color: #f8fafc;
+        margin: 0;
+        overflow: hidden;
+      }
+      .glass {
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .nexus-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+        background-size: 200% 200%;
+        animation: gradientMove 6s ease infinite;
+      }
+      @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .animate-text-shimmer {
+        background: linear-gradient(to right, #94a3b8 20%, #f8fafc 40%, #f8fafc 60%, #94a3b8 80%);
+        background-size: 200% auto;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        animation: textShimmer 4s linear infinite;
+      }
+      @keyframes textShimmer {
+        to { background-position: 200% center; }
+      }
+      .message-reveal {
+        animation: messageReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes messageReveal {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .neural-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+      }
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.2.4/",
+        "react": "https://esm.sh/react@^19.2.4",
+        "lucide-react": "https://esm.sh/lucide-react@^0.475.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+        "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
