@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed for mobile
 
   useEffect(() => {
     const saved = localStorage.getItem('nexus_pro_sessions');
@@ -26,6 +26,11 @@ const App: React.FC = () => {
       } catch (e) {
         console.error("Local Storage sync failed:", e);
       }
+    }
+    
+    // Auto-open sidebar on large screens
+    if (window.innerWidth >= 1024) {
+      setIsSidebarOpen(true);
     }
   }, []);
 
@@ -80,13 +85,12 @@ const App: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const current = sessions.find(s => s.id === sessionId) || { messages: [] };
-      const history = current.messages.map(m => ({
+      const ai = AIService.getInstance();
+      const history = (sessions.find(s => s.id === sessionId)?.messages || []).map(m => ({
         role: m.role === 'user' ? 'user' as const : 'model' as const,
         parts: [{ text: m.content }]
       }));
 
-      const ai = AIService.getInstance();
       const response = await ai.generateChatResponse(content, history);
 
       const botMessage: Message = {
@@ -109,23 +113,30 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-[#020617] text-gray-100 overflow-hidden font-sans">
-      {/* Mobile Top Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-panel z-30 flex items-center justify-between px-6 border-b border-white/5">
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-xl bg-white/5 text-indigo-400">
+      {/* Mobile Header Overlay */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-panel z-40 flex items-center justify-between px-6 border-b border-white/5">
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+          className="p-2.5 rounded-xl bg-white/5 text-indigo-400 active:scale-90 transition-transform"
+        >
           {isSidebarOpen ? <X /> : <Menu />}
         </button>
         <div className="flex items-center gap-2">
            <Command className="w-5 h-5 text-indigo-500" />
            <span className="font-black tracking-tighter text-white">NEXUS-5</span>
         </div>
-        <button onClick={handleNewChat} className="p-2 rounded-xl bg-indigo-500/20 text-indigo-400">
+        <button 
+          onClick={handleNewChat} 
+          className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 active:scale-90 transition-transform"
+        >
           <Plus className="w-5 h-5" />
         </button>
       </div>
 
-      <div className={`
-        fixed lg:relative z-40 h-full transition-all duration-500 ease-in-out
-        ${isSidebarOpen ? 'translate-x-0 w-80' : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'}
+      {/* Sidebar with dynamic width */}
+      <aside className={`
+        fixed lg:relative z-[50] h-full transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)
+        ${isSidebarOpen ? 'translate-x-0 w-[85%] sm:w-80' : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'}
       `}>
         <Sidebar 
           sessions={sessions}
@@ -134,13 +145,17 @@ const App: React.FC = () => {
           onSelectSession={id => { setActiveSessionId(id); if(window.innerWidth < 1024) setIsSidebarOpen(false); }}
           onDeleteSession={id => setSessions(sessions.filter(s => s.id !== id))}
         />
-      </div>
+      </aside>
 
+      {/* Backdrop for Mobile */}
       {isSidebarOpen && (
-        <div className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-md z-30" onClick={() => setIsSidebarOpen(false)} />
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] transition-opacity duration-300" 
+          onClick={() => setIsSidebarOpen(false)} 
+        />
       )}
 
-      <main className="flex-1 flex flex-col pt-16 lg:pt-0 relative overflow-hidden">
+      <main className="flex-1 flex flex-col pt-16 lg:pt-0 relative overflow-hidden h-full">
         <ChatInterface 
           messages={activeSession?.messages || []} 
           onSendMessage={handleSendMessage}

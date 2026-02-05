@@ -3,7 +3,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/512/artificial-intelligence.png" />
     <title>NEXUS-5 PRO | TECH MASTER</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -19,6 +24,7 @@
         color: #f1f5f9;
         margin: 0;
         overflow: hidden;
+        overscroll-behavior-y: contain;
       }
       .glass-panel {
         background: rgba(15, 23, 42, 0.75);
@@ -85,6 +91,15 @@
       @keyframes pulse {
         0%, 100% { opacity: 0.3; }
         50% { opacity: 1; }
+      }
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      /* Hide scrollbar for IE, Edge and Firefox */
+      .scrollbar-hide {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
       }
     </style>
     <script type="importmap">

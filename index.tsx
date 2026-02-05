@@ -3,13 +3,19 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Nexus SW Registered'))
+      .catch(err => console.warn('Nexus SW Registration Failed:', err));
+  });
+}
+
 const mountApp = () => {
   try {
     const rootElement = document.getElementById('root');
-    if (!rootElement) {
-      console.error("Nexus Core Error: Root element not found.");
-      return;
-    }
+    if (!rootElement) return;
 
     const root = ReactDOM.createRoot(rootElement);
     root.render(
@@ -17,16 +23,16 @@ const mountApp = () => {
         <App />
       </React.StrictMode>
     );
-    console.log("Nexus Core: UI Mounted Successfully.");
   } catch (error) {
     console.error("Nexus Core Critical Mount Error:", error);
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      rootElement.innerHTML = `<div style="color: #ef4444; padding: 20px; font-family: sans-serif; text-align: center; background: #020617; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1 style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Core Initialization Failed</h1>
-        <p style="font-size: 12px; opacity: 0.7; max-width: 400px; line-height: 1.6;">${error instanceof Error ? error.message : 'Unknown link error'}</p>
-        <p style="font-size: 10px; margin-top: 20px; color: #4f46e5;">Check browser console for details</p>
-      </div>`;
+      rootElement.innerHTML = `
+        <div style="color: #6366f1; background: #020617; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: sans-serif;">
+          <h1 style="letter-spacing: 5px; font-weight: 900;">CORE FAILURE</h1>
+          <p style="opacity: 0.6; font-size: 12px; margin-top: 10px;">${error instanceof Error ? error.message : 'Unknown'}</p>
+        </div>
+      `;
     }
   }
 };
