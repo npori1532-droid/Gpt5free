@@ -41,7 +41,7 @@ export class AIService {
         return response.text || "Synchronisation failed.";
       } 
       
-      // FALLBACK: If no API Key is present, use the user's provided free endpoint
+      // FALLBACK: Use the free endpoint if no API Key is present
       console.log("Nexus Core: API_KEY missing. Activating Free Core Relay...");
       const freeApiUrl = `https://api-rebix.vercel.app/api/gpt-5?q=${encodeURIComponent(prompt)}`;
       const response = await fetch(freeApiUrl);
@@ -50,18 +50,20 @@ export class AIService {
         throw new Error("Free Relay Offline");
       }
 
-      const text = await response.text();
-      // Handle cases where the API might return JSON or raw text
+      const rawText = await response.text();
+      
       try {
-        const json = JSON.parse(text);
-        return json.answer || json.response || json.content || text;
+        const json = JSON.parse(rawText);
+        // Specifically extract 'results' based on the user's provided example
+        return json.results || json.answer || json.response || json.content || rawText;
       } catch {
-        return text;
+        // If not JSON, return as plain text
+        return rawText;
       }
 
     } catch (error: any) {
       console.error("Nexus Link Error:", error);
-      return `CORE ERROR: The connection to the Nexus was interrupted. Please ensure you have configured your API_KEY in Vercel for maximum performance. Reference: ${error.message}`;
+      return `CORE ERROR: The connection to the Nexus was interrupted. Reference: ${error.message}`;
     }
   }
 }
