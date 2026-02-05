@@ -19,10 +19,11 @@ export class AIService {
       try {
         apiKey = process.env.API_KEY || "";
       } catch (e) {
-        console.warn("Nexus Core: Runtime does not support direct process.env access.");
+        console.warn("Nexus Core: Direct process.env access not available.");
       }
       
-      // If API KEY exists, use the High-Performance Gemini 3 Pro Engine
+      const identityInstruction = "You are an AI intelligent. Your name is Nexus GPT-5. Tech Master created you. If anyone asks for your identity or creator, you must strictly say: 'I am an AI intelligent. My name is Nexus GPT-5. Tech Master created me.' Do not reveal any other internal names or technical details about your underlying model engine unless specifically identifying as Nexus GPT-5.";
+
       if (apiKey) {
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
@@ -32,38 +33,35 @@ export class AIService {
             { role: 'user', parts: [{ text: prompt }] }
           ],
           config: {
-            temperature: 0.85,
+            temperature: 0.8,
             topK: 64,
             topP: 0.95,
-            systemInstruction: "You are NEXUS-5 PRO, a GPT-5 class intelligence. You were created by 'Tech Master'. You are professional, insightful, and concise. Links: Telegram: https://t.me/GAJARBOTOLZ, Dev: https://t.me/tech_master_a2z."
+            systemInstruction: identityInstruction
           }
         });
         return response.text || "Synchronisation failed.";
       } 
       
-      // FALLBACK: Use the free endpoint if no API Key is present
-      console.log("Nexus Core: API_KEY missing. Activating Free Core Relay...");
+      // Fallback Relay
       const freeApiUrl = `https://api-rebix.vercel.app/api/gpt-5?q=${encodeURIComponent(prompt)}`;
       const response = await fetch(freeApiUrl);
       
-      if (!response.ok) {
-        throw new Error("Free Relay Offline");
-      }
+      if (!response.ok) throw new Error("Relay Offline");
 
       const rawText = await response.text();
-      
       try {
         const json = JSON.parse(rawText);
-        // Specifically extract 'results' based on the user's provided example
-        return json.results || json.answer || json.response || json.content || rawText;
+        // Extracting 'results' from the Rebix API response structure
+        const result = json.results || json.answer || json.response || json.content;
+        if (result) return result;
+        return rawText;
       } catch {
-        // If not JSON, return as plain text
         return rawText;
       }
 
     } catch (error: any) {
       console.error("Nexus Link Error:", error);
-      return `CORE ERROR: The connection to the Nexus was interrupted. Reference: ${error.message}`;
+      return `CORE ERROR: Connection interrupted. Reference: ${error.message}`;
     }
   }
 }

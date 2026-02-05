@@ -112,33 +112,31 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#020617] text-gray-100 overflow-hidden font-sans fixed inset-0">
-      {/* Mobile Header Overlay */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-panel z-40 flex items-center justify-between px-6 border-b border-white/5">
+    <div className="flex h-[100dvh] w-screen bg-[#020617] text-gray-100 overflow-hidden font-sans fixed inset-0">
+      {/* Mobile Nav Bar - Thinner to feel less "large" */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 glass-panel z-40 flex items-center justify-between px-4 border-b border-white/5">
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-          className="p-2.5 rounded-xl bg-white/5 text-indigo-400 active:scale-90 transition-transform"
-          aria-label="Toggle Sidebar"
+          className="p-2 rounded-lg bg-white/5 text-indigo-400"
         >
-          {isSidebarOpen ? <X /> : <Menu />}
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <div className="flex items-center gap-2">
-           <Command className="w-5 h-5 text-indigo-500" />
-           <span className="font-black tracking-tighter text-white">NEXUS-5</span>
+        <div className="flex items-center gap-1.5">
+           <Command className="w-4 h-4 text-indigo-500" />
+           <span className="font-black text-sm tracking-tighter text-white">NEXUS GPT-5</span>
         </div>
         <button 
           onClick={handleNewChat} 
-          className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 active:scale-90 transition-transform"
-          aria-label="New Chat"
+          className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400"
         >
-          <Plus className="w-5 h-5" />
+          <Plus size={20} />
         </button>
       </div>
 
-      {/* Sidebar with dynamic width */}
+      {/* Sidebar with constrained mobile width */}
       <aside className={`
         fixed lg:relative z-[50] h-full transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)
-        ${isSidebarOpen ? 'translate-x-0 w-[85%] sm:w-80' : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'}
+        ${isSidebarOpen ? 'translate-x-0 w-[80%] sm:w-72' : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'}
       `}>
         <Sidebar 
           sessions={sessions}
@@ -149,15 +147,16 @@ const App: React.FC = () => {
         />
       </aside>
 
-      {/* Backdrop for Mobile */}
+      {/* Backdrop */}
       {isSidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] transition-opacity duration-300" 
+          className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[45]" 
           onClick={() => setIsSidebarOpen(false)} 
         />
       )}
 
-      <main className="flex-1 flex flex-col pt-16 lg:pt-0 relative overflow-hidden h-full w-full">
+      {/* Main Viewport Container */}
+      <main className="flex-1 flex flex-col pt-14 lg:pt-0 relative overflow-hidden h-full w-full">
         <ChatInterface 
           messages={activeSession?.messages || []} 
           onSendMessage={handleSendMessage}
